@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Control de aves</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="title_activity_bird_details">Detalles del ave</string>
+    <string name="bird_photo">Imagen del ave</string>
+    <string name="race">Raza</string>
+    <string name="variation">Variación</string>
+    <string name="ring">Anilla</string>
+    <string name="code">Código</string>
+    <string name="birth_date">Fecha nacimiento</string>
+    <string name="annotations">Anotaciones</string>
+    <string name="procedence">Procedencia</string>
+    <string name="jaula_number">Nº Jaula</string>
+    <string name="abrv_female">H</string>
+    <string name="female">Hembra</string>
+    <string name="abrv_male">M</string>
+    <string name="male">Macho</string>
+
+</resources>

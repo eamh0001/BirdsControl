@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_s">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/padding_s"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/birdPhoto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:contentDescription="@string/bird_photo"
+                    android:src="@color/colorPrimary" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Spinner
+                        android:id="@+id/spGenre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/genres" />
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <Button
+                        android:id="@+id/btnTakePhoto"
+                        android:layout_width="@dimen/icon_size"
+                        android:layout_height="@dimen/icon_size"
+                        android:background="@drawable/camera" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shrinkColumns="*"
+                android:stretchColumns="*">
+
+                <TableRow>
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etRaceValue"
+                        android:text="@string/race" />
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etVariationValue"
+                        android:text="@string/variation" />
+                </TableRow>
+
+                <TableRow>
+
+                    <EditText
+                        android:id="@+id/etRaceValue"
+                        style="@style/TextViewValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="20"
+                        android:inputType="textShortMessage|textMultiLine"
+                        android:maxEms="20"
+                        android:text="Canario maricón de rabo corto" />
+
+                    <EditText
+                        android:id="@+id/etVariationValue"
+                        style="@style/TextViewValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="20"
+                        android:inputType="textShortMessage|textMultiLine"
+                        android:maxEms="20"
+                        android:text="Agata rojo mosaico con ojos azules" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shrinkColumns="*"
+                android:stretchColumns="*">
+
+                <TableRow>
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etRingValue"
+                        android:text="@string/ring" />
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etCodeValue"
+                        android:text="@string/code" />
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etBirthDate"
+                        android:text="@string/birth_date" />
+                </TableRow>
+
+                <TableRow>
+
+                    <EditText
+                        android:id="@+id/etRingValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textShortMessage"
+                        android:text="RJ-450" />
+
+                    <EditText
+                        android:id="@+id/etCodeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textShortMessage"
+                        android:text="Codigurum" />
+
+                    <EditText
+                        android:id="@+id/etBirthDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="date" />
+                </TableRow>
+            </TableLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/TextViewHeading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@+id/etProcedence"
+                        android:text="@string/procedence" />
+
+                    <EditText
+                        android:id="@+id/etProcedence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="20"
+                        android:inputType="text" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etAnnotations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/annotations"
+                android:inputType="textMultiLine"
+                android:text="jkfdfdjñfdjfdfjfkfkafokkfkfñdk
+                sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+                kgmfgmfgmfkrtjremglfñgf
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji
+sfopakoptkrtjworktltretlñrkeltrtijwèritjerotji" />
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</ScrollView>

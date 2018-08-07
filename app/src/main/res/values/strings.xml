@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Bird\'s Control</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_bird_details">Bird Details</string>
+    <string name="bird_photo">Bird\'s Photo</string>
+    <string name="race">Race</string>
+    <string name="variation">Variation</string>
+    <string name="ring">Ring</string>
+    <string name="code">Code</string>
+    <string name="birth_date">Birth date</string>
+    <string name="annotations">Annotations</string>
+    <string name="jaula_number">Cage Nº</string>
+    <string name="abrv_female">F</string>
+    <string name="female">Female</string>
+    <string name="abrv_male">M</string>
+    <string name="male">Male</string>
+    <string name="have_died">Have died</string>
+    <string name="more_info">More info</string>
+    <string-array name="genres">
+        <item>@string/female</item>
+        <item>@string/male</item>
+    </string-array>
+</resources>
