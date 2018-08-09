@@ -9,6 +9,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.eamh.birdcontrol.R;
+import com.eamh.birdcontrol.data.models.Bird;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -35,11 +37,11 @@ public class BirdDetailsFragment extends Fragment {
 
     private static final String TAG = BirdDetailsFragment.class.getName();
     private static final int REQUEST_TAKE_PHOTO = 1;
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+
+    private static final String BUNDLE_KEY_BIRD_DETAILS = "BUNDLE_KEY_BIRD_DETAILS";
     private OnBirdDetailsFragmentInteractionListener mListener;
+
+    private Bird bird;
 
     private ImageView birdPhoto;
     private Spinner spGenre;
@@ -47,33 +49,33 @@ public class BirdDetailsFragment extends Fragment {
     private EditText etRaceValue;
     private EditText etVariationValue;
     private EditText etRingValue;
-    private EditText etCodeValue;
     private EditText etBirthDate;
-    private EditText etProcedence;
-    private Button btOrigin;
-    private Button btDescendants;
+    private EditText etOrigin;
+    private EditText etCage;
     private EditText etAnnotations;
     private FloatingActionButton fabSave;
 
-    private String imagePath;
+    private long _idBird = -1;
+    private String imagePath = "";
 
     public BirdDetailsFragment() {
     }
 
-    public static BirdDetailsFragment newInstance(int columnCount) {
+    public static BirdDetailsFragment newInstance(Bird bird) {
         BirdDetailsFragment fragment = new BirdDetailsFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
+        if (bird != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(BUNDLE_KEY_BIRD_DETAILS, bird);
+            fragment.setArguments(args);
+        }
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            bird = getArguments().getParcelable(BUNDLE_KEY_BIRD_DETAILS);
         }
     }
 
@@ -98,24 +100,61 @@ public class BirdDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_bird_details, container, false);
-
-        birdPhoto = rootView.findViewById(R.id.birdPhoto);
-        btnTakePhoto = rootView.findViewById(R.id.btnTakePhoto);
-        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchTakePhotoIntent();
-            }
-        });
+        bindViews(rootView);
+        setUIListeners();
+        if (bird != null) {
+            showBirdDataOnUI(bird);
+        }
         return rootView;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            savePhotoPathOnDb(imagePath);
             setBirdPhoto(imagePath);
         }
+    }
+
+    private void bindViews(View rootView) {
+        birdPhoto = rootView.findViewById(R.id.birdPhoto);
+        btnTakePhoto = rootView.findViewById(R.id.btnTakePhoto);
+        spGenre = rootView.findViewById(R.id.spGenre);
+        etRaceValue = rootView.findViewById(R.id.etRaceValue);
+        etVariationValue = rootView.findViewById(R.id.etVariationValue);
+        etRingValue = rootView.findViewById(R.id.etRingValue);
+        etBirthDate = rootView.findViewById(R.id.etBirthDate);
+        etOrigin = rootView.findViewById(R.id.etProcedence);
+        etCage = rootView.findViewById(R.id.etCage);
+        etAnnotations = rootView.findViewById(R.id.etAnnotations);
+        fabSave = rootView.findViewById(R.id.fabSave);
+    }
+
+    private void setUIListeners() {
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchTakePhotoIntent();
+            }
+        });
+        fabSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                saveBirdClicked();
+            }
+        });
+    }
+
+    private void showBirdDataOnUI(Bird bird) {
+        setBirdPhoto(bird.getImageUrl());
+        spGenre.setSelection(bird.getGender().ordinal());
+        ;
+        etRaceValue.setText(bird.getRace());
+        etVariationValue.setText(bird.getVariation());
+        etRingValue.setText(bird.getRing());
+        etBirthDate.setText(bird.getBirthDate());
+        etOrigin.setText(bird.getOrigin());
+        etCage.setText(bird.getCage());
+        etAnnotations.setText(bird.getAnnotations());
     }
 
     private File createImageFile() throws IOException {
@@ -125,7 +164,7 @@ public class BirdDetailsFragment extends Fragment {
         File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+                ".jpg",   /* suffix */
                 storageDir      /* directory */
         );
 
@@ -159,18 +198,43 @@ public class BirdDetailsFragment extends Fragment {
         }
     }
 
-    private void savePhotoPathOnDb(String imagePath) {
-        //TODO
+    private void setBirdPhoto(String imagePath) {
+        if (!TextUtils.isEmpty(imagePath)) {
+            Picasso.get().load(new File(imagePath))
+                    .fit()
+                    .centerCrop()
+                    .into(birdPhoto);
+            this.imagePath = imagePath;
+        }
     }
 
-    private void setBirdPhoto(String imagePath) {
-        Picasso.get().load(new File(imagePath))
-                .resize(100, 100)
-                .centerCrop()
-                .into(birdPhoto);
+    private void saveBirdClicked() {
+        Bird bird = createBirdFromUIData();
+        Log.d(TAG, "SaveDataOnDb " + bird);
+        mListener.onSaveBirdClicked(bird);
+    }
+
+    private Bird createBirdFromUIData() {
+        Bird bird = new Bird();
+        bird.set_id(_idBird);
+        bird.setBirthDate(etBirthDate.getText().toString());
+        bird.setGender(getGenreFromSpinner());
+        bird.setImageUrl(imagePath);
+        bird.setRace(etRaceValue.getText().toString());
+        bird.setVariation(etVariationValue.getText().toString());
+        bird.setRing(etRingValue.getText().toString());
+        bird.setCage(etCage.getText().toString());
+        bird.setOrigin(etOrigin.getText().toString());
+        bird.setAnnotations(etAnnotations.getText().toString());
+        return bird;
+    }
+
+    public Bird.Gender getGenreFromSpinner() {
+        int genreIndex = spGenre.getSelectedItemPosition();
+        return Bird.Gender.values()[genreIndex];
     }
 
     public interface OnBirdDetailsFragmentInteractionListener {
-
+        void onSaveBirdClicked(Bird bird);
     }
 }

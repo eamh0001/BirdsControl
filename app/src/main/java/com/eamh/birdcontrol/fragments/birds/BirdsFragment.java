@@ -3,7 +3,6 @@ package com.eamh.birdcontrol.fragments.birds;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eamh.birdcontrol.R;
-import com.eamh.birdcontrol.data.dummy.DummyBird;
 import com.eamh.birdcontrol.data.models.Bird;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -22,11 +23,10 @@ import com.eamh.birdcontrol.data.models.Bird;
  */
 public class BirdsFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
-    private OnBirdsFragmentInteractionListener mListener;
+    private static final String BUNDLE_KEY_BIRDS = "BUNDLE_KEY_BIRDS";
+
+    private OnBirdsFragmentInteractionListener birdsFragmentInteractionListener;
+    private List<Bird> birds;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -35,12 +35,11 @@ public class BirdsFragment extends Fragment {
     public BirdsFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static BirdsFragment newInstance(int columnCount) {
+    public static BirdsFragment newInstance(ArrayList<Bird> birds) {
         BirdsFragment fragment = new BirdsFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putParcelableArrayList(BUNDLE_KEY_BIRDS, birds);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,8 +48,9 @@ public class BirdsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            birds = arguments.getParcelableArrayList(BUNDLE_KEY_BIRDS);
         }
     }
 
@@ -59,18 +59,16 @@ public class BirdsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_birds, container, false);
 
-        // Set the adapter
-
-        Context context = view.getContext();
         RecyclerView recyclerView = view.findViewById(R.id.list);
-        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(DummyBird.ITEMS, mListener));
-
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+//        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(DummyBird.ITEMS, birdsFragmentInteractionListener));
+        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(birds, birdsFragmentInteractionListener));
+        FloatingActionButton fabNewBird = view.findViewById(R.id.fab);
+        fabNewBird.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Add Bird", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                birdsFragmentInteractionListener.onBirdsFragmentListClicked(null);
+//                Snackbar.make(view, "Add Bird", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 
@@ -81,7 +79,7 @@ public class BirdsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnBirdsFragmentInteractionListener) {
-            mListener = (OnBirdsFragmentInteractionListener) context;
+            birdsFragmentInteractionListener = (OnBirdsFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnBreedFragmentInteractionListener");
@@ -91,7 +89,7 @@ public class BirdsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        birdsFragmentInteractionListener = null;
     }
 
     /**

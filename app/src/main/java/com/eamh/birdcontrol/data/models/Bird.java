@@ -1,21 +1,32 @@
 package com.eamh.birdcontrol.data.models;
 
-import java.util.Date;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Bird {
+public class Bird implements Parcelable {
+
+    public static final Parcelable.Creator<Bird> CREATOR = new Parcelable.Creator<Bird>() {
+        @Override
+        public Bird createFromParcel(Parcel source) {
+            return new Bird(source);
+        }
+
+        @Override
+        public Bird[] newArray(int size) {
+            return new Bird[size];
+        }
+    };
 
     private long _id;
-    private long _idBreedOrigin;
-    private String petName;
-    private String anilla;
+    private Gender gender;
     private String imageUrl;
-    private Genre genre;
-    private Date birthDate;
     private String race;
-    private String colorMutation;
+    private String variation;
+    private String ring;
+    private String cage;
+    private String birthDate;
+    private String origin;
     private String annotations;
-    private boolean isDead;
-    private boolean isBreeding;
 
     public long get_id() {
         return _id;
@@ -25,20 +36,21 @@ public class Bird {
         this._id = _id;
     }
 
-    public String getPetName() {
-        return petName;
+    public Bird() {
     }
 
-    public void setPetName(String petName) {
-        this.petName = petName;
-    }
-
-    public String getAnilla() {
-        return anilla;
-    }
-
-    public void setAnilla(String anilla) {
-        this.anilla = anilla;
+    protected Bird(Parcel in) {
+        this._id = in.readLong();
+        int tmpGender = in.readInt();
+        this.gender = tmpGender == -1 ? null : Gender.values()[tmpGender];
+        this.imageUrl = in.readString();
+        this.race = in.readString();
+        this.variation = in.readString();
+        this.ring = in.readString();
+        this.cage = in.readString();
+        this.birthDate = in.readString();
+        this.origin = in.readString();
+        this.annotations = in.readString();
     }
 
     public String getImageUrl() {
@@ -49,22 +61,6 @@ public class Bird {
         this.imageUrl = imageUrl;
     }
 
-    public Genre getGenre() {
-        return genre;
-    }
-
-    public void setGenre(Genre genre) {
-        this.genre = genre;
-    }
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
-
     public String getRace() {
         return race;
     }
@@ -73,12 +69,44 @@ public class Bird {
         this.race = race;
     }
 
-    public String getColorMutation() {
-        return colorMutation;
+    public Gender getGender() {
+        return gender;
     }
 
-    public void setColorMutation(String colorMutation) {
-        this.colorMutation = colorMutation;
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getVariation() {
+        return variation;
+    }
+
+    public void setVariation(String variation) {
+        this.variation = variation;
+    }
+
+    public String getRing() {
+        return ring;
+    }
+
+    public void setRing(String ring) {
+        this.ring = ring;
+    }
+
+    public String getCage() {
+        return cage;
+    }
+
+    public void setCage(String cage) {
+        this.cage = cage;
+    }
+
+    public String getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(String birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getAnnotations() {
@@ -89,51 +117,52 @@ public class Bird {
         this.annotations = annotations;
     }
 
-    public boolean isDead() {
-        return isDead;
+    public String getOrigin() {
+        return origin;
     }
 
-    public void setDead(boolean dead) {
-        isDead = dead;
-    }
-
-    public boolean isBreeding() {
-        return isBreeding;
-    }
-
-    public void setBreeding(boolean breeding) {
-        isBreeding = breeding;
-    }
-
-    public long get_idBreedOrigin() {
-        return _idBreedOrigin;
-    }
-
-    public void set_idBreedOrigin(long _idBreedOrigin) {
-        this._idBreedOrigin = _idBreedOrigin;
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     @Override
     public String toString() {
         return "Bird{" +
                 "_id=" + _id +
-                ", petName='" + petName + '\'' +
-                ", anilla='" + anilla + '\'' +
+                ", gender=" + gender +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", genre=" + genre +
-                ", birthDate=" + birthDate +
                 ", race='" + race + '\'' +
-                ", colorMutation='" + colorMutation + '\'' +
+                ", variation='" + variation + '\'' +
+                ", ring='" + ring + '\'' +
+                ", cage='" + cage + '\'' +
+                ", birthDate=" + birthDate +
+                ", origin='" + origin + '\'' +
                 ", annotations='" + annotations + '\'' +
-                ", isDead=" + isDead +
-                ", isBreeding=" + isBreeding +
-                ", _idBreedOrigin=" + _idBreedOrigin +
                 '}';
     }
 
-    public enum Genre {
-        MALE,
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this._id);
+        dest.writeInt(this.gender == null ? -1 : this.gender.ordinal());
+        dest.writeString(this.imageUrl);
+        dest.writeString(this.race);
+        dest.writeString(this.variation);
+        dest.writeString(this.ring);
+        dest.writeString(this.cage);
+        dest.writeString(this.birthDate);
+        dest.writeString(this.origin);
+        dest.writeString(this.annotations);
+    }
+
+    public enum Gender {
+        UNDEFINED,
         FEMALE,
-        UNDEFINED
+        MALE
     }
 }

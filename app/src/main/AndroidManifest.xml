@@ -42,6 +42,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <provider
+            android:name=".data.BirdsContentProvider"
+            android:authorities="@string/content_authority"
+            android:exported="true"
+            android:permission="com.eamh.birdcontrol.provider.READ_WRITE" />
+
     </application>
 
 </manifest>

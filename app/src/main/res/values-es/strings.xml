@@ -10,11 +10,13 @@
     <string name="code">Código</string>
     <string name="birth_date">Fecha nacimiento</string>
     <string name="annotations">Anotaciones</string>
-    <string name="procedence">Procedencia</string>
-    <string name="jaula_number">Nº Jaula</string>
+    <string name="origin">Procedencia</string>
+    <string name="cage">Jaula</string>
     <string name="abrv_female">H</string>
     <string name="female">Hembra</string>
     <string name="abrv_male">M</string>
     <string name="male">Macho</string>
-
+    <string name="abrv_undefined">I</string>
+    <string name="undefined">Indefinido</string>
+    <string name="error_loading_bird">Can\'t retrieve bird</string>
 </resources>

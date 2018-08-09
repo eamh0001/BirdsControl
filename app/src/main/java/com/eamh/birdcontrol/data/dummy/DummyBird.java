@@ -3,7 +3,6 @@ package com.eamh.birdcontrol.data.dummy;
 import com.eamh.birdcontrol.data.models.Bird;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,16 +41,12 @@ public class DummyBird {
     public static Bird createDummyItem(int position) {
         Bird bird = new Bird();
         bird.set_id(position);
-        bird.set_idBreedOrigin(position);
-        bird.setPetName("Bird " + position);
-        bird.setAnilla("Anilla " + position);
+        bird.setRing("Anilla " + position);
         bird.setImageUrl("Url " + position);
-        bird.setGenre(position % 2 == 0 ? Bird.Genre.MALE : Bird.Genre.FEMALE);
-        bird.setBirthDate(new Date());
+        bird.setGender(position % 2 == 0 ? Bird.Gender.MALE : Bird.Gender.FEMALE);
+        bird.setBirthDate("21/21/2121");
         bird.setRace("Canario");
-        bird.setColorMutation("Ágata rojo mosaico");
-        bird.setDead(false);
-        bird.setBreeding(true);
+        bird.setVariation("Ágata rojo mosaico");
         return bird;
     }
 }
