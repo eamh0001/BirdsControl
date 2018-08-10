@@ -27,4 +27,11 @@
 
 
     <string name="content_authority" translatable="false">com.eamh.birdcontrol</string>
+    <string name="bird_updated">Bird Updated</string>
+    <string name="bird_created">Bird Created</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="photo">Photo</string>
+    <string name="no_data_available">No data available</string>
 </resources>

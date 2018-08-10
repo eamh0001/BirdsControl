@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.eamh.birdcontrol.data.ContentProviderPersistenceManager;
+import com.eamh.birdcontrol.data.BirdsContentProviderPersistenceManager;
 import com.eamh.birdcontrol.data.PersistenceManager;
 import com.eamh.birdcontrol.data.models.Bird;
 import com.eamh.birdcontrol.fragments.birds.BirdsFragment;
@@ -36,13 +36,18 @@ public class MainActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
-        persistenceManager = ContentProviderPersistenceManager.builder()
+        persistenceManager = BirdsContentProviderPersistenceManager.builder()
                 .setLoaderId(ID_BIRDS_MAIN_LOADER)
                 .setContentResolver(getContentResolver())
-                .setLoaderManager(getLoaderManager())
+                .setLoaderManager(getSupportLoaderManager())
                 .setResponseListener(this)
                 .setContext(this)
                 .build();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         showLoadingBar(true);
         persistenceManager.retrieveAllBirds();
     }
@@ -50,6 +55,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBirdsFragmentListClicked(Bird bird) {
         launchBirdDetails(bird);
+    }
+
+    @Override
+    public void onBirdsFragmentDeleteItem(long birdId) {
+        showSnackBar("Deleted bird " + birdId);
+        persistenceManager.deleteBird(birdId);
+        persistenceManager.retrieveAllBirds();
     }
 
     @Override
@@ -74,7 +86,7 @@ public class MainActivity extends AppCompatActivity
     public void onDatabaseError(String error, PersistenceManager.ErrorCode errorCode) {
         Log.e(TAG, "onDatabaseError " + error);
         showLoadingBar(false);
-        Snackbar.make(toolbar, error, Snackbar.LENGTH_SHORT).show();
+        showSnackBar(error);
     }
 
     private void launchBirdDetails(Bird bird) {
@@ -87,5 +99,9 @@ public class MainActivity extends AppCompatActivity
 
     private void showLoadingBar(boolean show) {
         mLoadingIndicator.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void showSnackBar(String info) {
+        Snackbar.make(toolbar, info, Snackbar.LENGTH_SHORT).show();
     }
 }

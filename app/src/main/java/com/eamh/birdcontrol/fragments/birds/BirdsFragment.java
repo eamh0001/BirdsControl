@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,19 +61,45 @@ public class BirdsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_birds, container, false);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
-//        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(DummyBird.ITEMS, birdsFragmentInteractionListener));
-        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(birds, birdsFragmentInteractionListener));
+        initRecyclerView(recyclerView);
         FloatingActionButton fabNewBird = view.findViewById(R.id.fab);
         fabNewBird.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 birdsFragmentInteractionListener.onBirdsFragmentListClicked(null);
-//                Snackbar.make(view, "Add Bird", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
 
         return view;
+    }
+
+    private void initRecyclerView(RecyclerView recyclerView) {
+
+//        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(DummyBird.ITEMS, birdsFragmentInteractionListener));
+        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(birds, birdsFragmentInteractionListener));
+
+         /*As T09.07 of NanoDegree:
+         Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
+         An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+         and uses callbacks to signal when a user is performing these actions.
+         */
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            // Called when a user swipes left or right on a ViewHolder
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+
+                // Here is where you'll implement swipe to delete
+                //Use getTag (from the adapter code) to get the id of the swiped item
+                // Retrieve the id of the task to delete
+                long birdId = (long) viewHolder.itemView.getTag();
+                birdsFragmentInteractionListener.onBirdsFragmentDeleteItem(birdId);
+            }
+        }).attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -104,5 +131,7 @@ public class BirdsFragment extends Fragment {
      */
     public interface OnBirdsFragmentInteractionListener {
         void onBirdsFragmentListClicked(Bird bird);
+
+        void onBirdsFragmentDeleteItem(long birdId);
     }
 }

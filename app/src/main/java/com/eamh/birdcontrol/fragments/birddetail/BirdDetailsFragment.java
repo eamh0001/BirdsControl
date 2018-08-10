@@ -39,7 +39,7 @@ public class BirdDetailsFragment extends Fragment {
     private static final int REQUEST_TAKE_PHOTO = 1;
 
     private static final String BUNDLE_KEY_BIRD_DETAILS = "BUNDLE_KEY_BIRD_DETAILS";
-    private OnBirdDetailsFragmentInteractionListener mListener;
+    private OnBirdDetailsFragmentInteractionListener birdDetailsFragmentInteractionListener;
 
     private Bird bird;
 
@@ -83,7 +83,7 @@ public class BirdDetailsFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnBirdDetailsFragmentInteractionListener) {
-            mListener = (OnBirdDetailsFragmentInteractionListener) context;
+            birdDetailsFragmentInteractionListener = (OnBirdDetailsFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnBreedFragmentInteractionListener");
@@ -93,7 +93,7 @@ public class BirdDetailsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        birdDetailsFragmentInteractionListener = null;
     }
 
     @Override
@@ -142,12 +142,24 @@ public class BirdDetailsFragment extends Fragment {
                 saveBirdClicked();
             }
         });
+        birdPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!TextUtils.isEmpty(imagePath)) {
+//                    birdDetailsFragmentInteractionListener.onBirdImageClicked(imagePath);
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(imagePath), "image/*");
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void showBirdDataOnUI(Bird bird) {
         setBirdPhoto(bird.getImageUrl());
         spGenre.setSelection(bird.getGender().ordinal());
-        ;
+        _idBird = bird.get_id();
         etRaceValue.setText(bird.getRace());
         etVariationValue.setText(bird.getVariation());
         etRingValue.setText(bird.getRing());
@@ -211,7 +223,7 @@ public class BirdDetailsFragment extends Fragment {
     private void saveBirdClicked() {
         Bird bird = createBirdFromUIData();
         Log.d(TAG, "SaveDataOnDb " + bird);
-        mListener.onSaveBirdClicked(bird);
+        birdDetailsFragmentInteractionListener.onSaveBirdClicked(bird);
     }
 
     private Bird createBirdFromUIData() {
@@ -236,5 +248,7 @@ public class BirdDetailsFragment extends Fragment {
 
     public interface OnBirdDetailsFragmentInteractionListener {
         void onSaveBirdClicked(Bird bird);
+
+        void onBirdImageClicked(String imagePath);
     }
 }

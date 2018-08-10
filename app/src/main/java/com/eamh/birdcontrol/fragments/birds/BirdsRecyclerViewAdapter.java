@@ -45,9 +45,9 @@ public class BirdsRecyclerViewAdapter
                 .fit()
                 .centerCrop()
                 .into(holder.mImageView);
-        holder.mIdView.setText("" + position);
-        holder.mContentView.setText(bird.getRing());
-
+        holder.mIdView.setText(bird.getRing());
+        holder.mContentView.setText(bird.getBirthDate());
+        holder.itemView.setTag(bird.get_id());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

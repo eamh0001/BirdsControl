@@ -1,6 +1,7 @@
 package com.eamh.birdcontrol.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -34,6 +35,8 @@ public class BirdsContentProvider extends ContentProvider {
      */
     private static final int CODE_BIRD_ITEM = 2;
 
+    private BirdsDbHelper birdsDbHelper;
+
     static {
         MATCHER.addURI(AUTHORITY, BirdsDbHelper.Contract.BirdEntry.TABLE_NAME, CODE_BIRDS_DIR);
         MATCHER.addURI(AUTHORITY, BirdsDbHelper.Contract.BirdEntry.TABLE_NAME + "/#", CODE_BIRD_ITEM);
@@ -42,53 +45,9 @@ public class BirdsContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        Context context = getContext();
+        birdsDbHelper = new BirdsDbHelper(context);
         return true;
-    }
-
-    @Nullable
-    @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
-                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-
-        Cursor cursor;
-        SQLiteDatabase db;
-        final Context context = getContext();
-        if (context == null) {
-            return null;
-        }
-        switch (MATCHER.match(uri)) {
-
-            case CODE_BIRDS_DIR:
-                db = new BirdsDbHelper(context).getReadableDatabase();
-                cursor = db.query(BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-
-            case CODE_BIRD_ITEM:
-                db = new BirdsDbHelper(context).getReadableDatabase();
-                String birdId = uri.getLastPathSegment();
-                String[] selectionArguments = new String[]{birdId};
-                cursor = db.query(BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
-                        projection,
-                        BirdsDbHelper.Contract.BirdEntry._ID + " = ? ",
-                        selectionArguments,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-
-            default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
-        }
-
-//        db.close();
-        cursor.setNotificationUri(context.getContentResolver(), uri);
-        return cursor;
     }
 
     @Nullable
@@ -113,24 +72,67 @@ public class BirdsContentProvider extends ContentProvider {
         int uriMatch = MATCHER.match(uri);
         System.out.println("insert " + uri + "\nMatch " + uriMatch);
 
-        if (uriMatch == CODE_BIRDS_DIR || uriMatch == CODE_BIRD_ITEM) {
+        if (uriMatch == CODE_BIRDS_DIR) {
             final Context context = getContext();
             if (context == null) {
                 return null;
             }
 
-            SQLiteDatabase db = new BirdsDbHelper(context).getWritableDatabase();
+            SQLiteDatabase db = birdsDbHelper.getWritableDatabase();
             long rowId = db.insert(BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
                     null,
                     contentValues);
-//            db.close();
-            if ((rowId != -1)) {
+            if ((rowId > 0)) {
                 context.getContentResolver().notifyChange(uri, null);
-                return CONTENT_BIRDS_URI.buildUpon().appendPath(Long.toString(rowId)).build();
-            } else throw new RuntimeException("Couldn't insert: " + uri);
-
+                return ContentUris.withAppendedId(CONTENT_BIRDS_URI, rowId);
+            } else throw new android.database.SQLException("Couldn't insert on: " + uri);
         } else throw new UnsupportedOperationException("Unknown uri: " + uri);
+    }
 
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
+                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+
+        Cursor cursor;
+        SQLiteDatabase db;
+        final Context context = getContext();
+        if (context == null) {
+            return null;
+        }
+        switch (MATCHER.match(uri)) {
+
+            case CODE_BIRDS_DIR:
+                db = birdsDbHelper.getReadableDatabase();
+                cursor = db.query(BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
+            case CODE_BIRD_ITEM:
+                db = birdsDbHelper.getReadableDatabase();
+                String birdId = uri.getLastPathSegment();
+                String[] selectionArguments = new String[]{birdId};
+                cursor = db.query(BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
+                        projection,
+                        BirdsDbHelper.Contract.BirdEntry._ID + " = ? ",
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+//        db.close();
+        cursor.setNotificationUri(context.getContentResolver(), uri);
+        return cursor;
     }
 
     @Override
@@ -154,37 +156,33 @@ public class BirdsContentProvider extends ContentProvider {
                 }
                 String birdId = uri.getLastPathSegment();
                 String[] selectionArguments = new String[]{birdId};
-                SQLiteDatabase db = new BirdsDbHelper(context).getWritableDatabase();
+                SQLiteDatabase db = birdsDbHelper.getWritableDatabase();
                 rowsDeleted = db.delete(
                         BirdsDbHelper.Contract.BirdEntry.TABLE_NAME,
-                        BirdsDbHelper.Contract.BirdEntry._ID + " = ? ",
+                        BirdsDbHelper.Contract.BirdEntry._ID + "=?",
                         selectionArguments);
-//                db.close();
-                context.getContentResolver().notifyChange(uri, null);
+                if (rowsDeleted != 0) {
+                    context.getContentResolver().notifyChange(uri, null);
+                }
                 break;
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
         return rowsDeleted;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         switch (MATCHER.match(uri)) {
-
-            case CODE_BIRDS_DIR:
-                throw new IllegalArgumentException("Invalid URI, cannot update without ID" + uri);
-
             case CODE_BIRD_ITEM:
                 final Context context = getContext();
                 if (context == null) {
                     return 0;
                 }
-                SQLiteDatabase db = new BirdsDbHelper(context).getWritableDatabase();
+                SQLiteDatabase db = birdsDbHelper.getWritableDatabase();
 
-                String where = BirdsDbHelper.Contract.BirdEntry._ID + " = ? ";
+                String where = BirdsDbHelper.Contract.BirdEntry._ID + "=?";
                 String birdId = uri.getLastPathSegment();
                 String[] selectionArguments = new String[]{birdId};
 
@@ -192,7 +190,9 @@ public class BirdsContentProvider extends ContentProvider {
                         contentValues,
                         where,
                         selectionArguments);
-                context.getContentResolver().notifyChange(uri, null);
+                if (count != 0) {
+                    context.getContentResolver().notifyChange(uri, null);
+                }
                 return count;
 
             default:

@@ -1,14 +1,15 @@
 package com.eamh.birdcontrol.data;
 
-import android.app.LoaderManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 
 import com.eamh.birdcontrol.R;
@@ -17,10 +18,10 @@ import com.eamh.birdcontrol.data.models.Bird;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContentProviderPersistenceManager
+public class BirdsContentProviderPersistenceManager
         implements PersistenceManager {
 
-    private static final String TAG = ContentProviderPersistenceManager.class.getSimpleName();
+    private static final String TAG = BirdsContentProviderPersistenceManager.class.getSimpleName();
 
     private ResponseListener responseListener;
     private ContentResolver contentResolver;
@@ -28,7 +29,7 @@ public class ContentProviderPersistenceManager
     private LoaderManager loaderManager;
     private int loaderId;
 
-    private ContentProviderPersistenceManager(Builder builder) {
+    private BirdsContentProviderPersistenceManager(Builder builder) {
         this.loaderId = builder.loaderId;
         this.contentResolver = builder.contentResolver;
         this.loaderManager = builder.loaderManager;
@@ -40,9 +41,51 @@ public class ContentProviderPersistenceManager
         return new Builder();
     }
 
+    public static List<Bird> cursorToBirdList(Cursor cursor) {
+        List<Bird> birdsFromCursor = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                Log.d(TAG, "cursor.moveToNext() ");
+                birdsFromCursor.add(cursorToBird(cursor));
+            }
+        }
+        return birdsFromCursor;
+    }
+
+    public static Bird cursorToBird(Cursor cursor) {
+        int columnIndexId = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry._ID);
+        int columnIndexGender = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_GENDER);
+        int columnIndexImgPath = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_IMG_PATH);
+        int columnIndexRace = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_RACE);
+        int columnIndexVariation = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_VARIATION);
+        int columnIndexRing = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_RING);
+        int columnIndexCage = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_CAGE);
+        int columnIndexBirthDate = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_BIRTH_DATE);
+        int columnIndexOrigin = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_ORIGIN);
+        int columnIndexAnnotations = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_ANNOTATIONS);
+
+
+        Bird bird = new Bird();
+        bird.set_id(cursor.getLong(columnIndexId));
+        bird.setGender(getGenderFromDbInt(cursor.getInt(columnIndexGender)));
+        bird.setImageUrl(cursor.getString(columnIndexImgPath));
+        bird.setRace(cursor.getString(columnIndexRace));
+        bird.setVariation(cursor.getString(columnIndexVariation));
+        bird.setRing(cursor.getString(columnIndexRing));
+        bird.setCage(cursor.getString(columnIndexCage));
+        bird.setBirthDate(cursor.getString(columnIndexBirthDate));
+        bird.setOrigin(cursor.getString(columnIndexOrigin));
+        bird.setAnnotations(cursor.getString(columnIndexAnnotations));
+        return bird;
+    }
+
+    private static Bird.Gender getGenderFromDbInt(int dbGender) {
+        return Bird.Gender.values()[dbGender];
+    }
+
     @Override
     public void retrieveAllBirds() {
-        loaderManager.initLoader(loaderId, null, createRetrieveAllBirdsLoaderCallbacks());
+        loaderManager.restartLoader(loaderId, null, createRetrieveAllBirdsLoaderCallbacks());
     }
 
     @Override
@@ -53,23 +96,19 @@ public class ContentProviderPersistenceManager
 
     @Override
     public void retrieveBird(long _idBird) {
-        loaderManager.initLoader(loaderId, null, createRetrieveBirdLoaderCallbacks(_idBird));
+        loaderManager.restartLoader(loaderId, null, createRetrieveBirdLoaderCallbacks(_idBird));
     }
 
     @Override
     public void updateBird(Bird bird) {
         ContentValues contentValues = birdToContentValues(bird);
-        Uri uriToUpdate = BirdsContentProvider.CONTENT_BIRDS_URI.buildUpon()
-                .appendPath(String.valueOf(bird.get_id()))
-                .build();
+        Uri uriToUpdate = ContentUris.withAppendedId(BirdsContentProvider.CONTENT_BIRDS_URI, bird.get_id());
         contentResolver.update(uriToUpdate, contentValues, null, null);
     }
 
     @Override
     public void deleteBird(long _idBird) {
-        Uri uriToDelete = BirdsContentProvider.CONTENT_BIRDS_URI.buildUpon()
-                .appendPath(String.valueOf(_idBird))
-                .build();
+        Uri uriToDelete = ContentUris.withAppendedId(BirdsContentProvider.CONTENT_BIRDS_URI, _idBird);
         contentResolver.delete(uriToDelete, null, null);
     }
 
@@ -110,9 +149,7 @@ public class ContentProviderPersistenceManager
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
                 if (i == loaderId) {
 
-                    Uri uriToQuery = BirdsContentProvider.CONTENT_BIRDS_URI.buildUpon()
-                            .appendPath(String.valueOf(birdId))
-                            .build();
+                    Uri uriToQuery = ContentUris.withAppendedId(BirdsContentProvider.CONTENT_BIRDS_URI, birdId);
                     return new CursorLoader(context,
                             uriToQuery,
                             null,
@@ -142,7 +179,7 @@ public class ContentProviderPersistenceManager
 
     private ContentValues birdToContentValues(Bird bird) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(BirdsDbHelper.Contract.BirdEntry._ID, bird.get_id());
+//        contentValues.put(BirdsDbHelper.Contract.BirdEntry._ID, bird.get_id());
         contentValues.put(BirdsDbHelper.Contract.BirdEntry.COLUMN_GENDER, getDbIntGender(bird.getGender()));
         contentValues.put(BirdsDbHelper.Contract.BirdEntry.COLUMN_IMG_PATH, bird.getImageUrl());
         contentValues.put(BirdsDbHelper.Contract.BirdEntry.COLUMN_RACE, bird.getRace());
@@ -153,48 +190,6 @@ public class ContentProviderPersistenceManager
         contentValues.put(BirdsDbHelper.Contract.BirdEntry.COLUMN_ORIGIN, bird.getOrigin());
         contentValues.put(BirdsDbHelper.Contract.BirdEntry.COLUMN_ANNOTATIONS, bird.getAnnotations());
         return contentValues;
-    }
-
-    private List<Bird> cursorToBirdList(Cursor cursor) {
-        List<Bird> birdsFromCursor = new ArrayList<>();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Log.d(TAG, "cursor.moveToNext() ");
-                birdsFromCursor.add(cursorToBird(cursor));
-            }
-        }
-        return birdsFromCursor;
-    }
-
-    private Bird cursorToBird(Cursor cursor) {
-        int columnIndexId = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry._ID);
-        int columnIndexGender = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_GENDER);
-        int columnIndexImgPath = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_IMG_PATH);
-        int columnIndexRace = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_RACE);
-        int columnIndexVariation = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_VARIATION);
-        int columnIndexRing = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_RING);
-        int columnIndexCage = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_CAGE);
-        int columnIndexBirthDate = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_BIRTH_DATE);
-        int columnIndexOrigin = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_ORIGIN);
-        int columnIndexAnnotations = cursor.getColumnIndex(BirdsDbHelper.Contract.BirdEntry.COLUMN_ANNOTATIONS);
-
-
-        Bird bird = new Bird();
-        bird.set_id(cursor.getLong(columnIndexId));
-        bird.setGender(getGenderFromDbInt(cursor.getInt(columnIndexGender)));
-        bird.setImageUrl(cursor.getString(columnIndexImgPath));
-        bird.setRace(cursor.getString(columnIndexRace));
-        bird.setVariation(cursor.getString(columnIndexVariation));
-        bird.setRing(cursor.getString(columnIndexRing));
-        bird.setCage(cursor.getString(columnIndexCage));
-        bird.setBirthDate(cursor.getString(columnIndexBirthDate));
-        bird.setOrigin(cursor.getString(columnIndexOrigin));
-        bird.setAnnotations(cursor.getString(columnIndexAnnotations));
-        return bird;
-    }
-
-    private Bird.Gender getGenderFromDbInt(int dbGender) {
-        return Bird.Gender.values()[dbGender];
     }
 
     private int getDbIntGender(Bird.Gender gender) {
@@ -237,8 +232,8 @@ public class ContentProviderPersistenceManager
             return this;
         }
 
-        public ContentProviderPersistenceManager build() {
-            return new ContentProviderPersistenceManager(this);
+        public BirdsContentProviderPersistenceManager build() {
+            return new BirdsContentProviderPersistenceManager(this);
         }
     }
 }

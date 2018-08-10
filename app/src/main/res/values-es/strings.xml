@@ -19,4 +19,8 @@
     <string name="abrv_undefined">I</string>
     <string name="undefined">Indefinido</string>
     <string name="error_loading_bird">Can\'t retrieve bird</string>
+    <string name="bird_updated">Bird Updated</string>
+    <string name="bird_created">Bird Created</string>
+    <string name="photo">Photo</string>
+    <string name="no_data_available">No data available</string>
 </resources>
