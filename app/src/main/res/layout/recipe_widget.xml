@@ -1,7 +1,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
+    android:background="@color/primary"
     android:padding="@dimen/widget_margin">
 
     <ListView
@@ -34,19 +34,34 @@
                 <TextView
                     android:id="@+id/tvGender"
                     android:layout_width="wrap_content"
+                    style="@style/TextViewWidget"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tvRing"
+                    style="@style/TextViewWidget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/tvBirthDate"
+                    style="@style/TextViewWidget"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
 
         <TextView
-            android:id="@+id/appwidget_text"
+            android:id="@+id/tvRace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:textColor="#ffffff"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
+            style="@style/TextViewWidget" />
+
+        <TextView
+            android:id="@+id/tvVariation"
+            style="@style/TextViewWidget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 
@@ -54,10 +69,6 @@
         android:id="@+id/appwidget_text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:text="@string/no_data_available"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
+        style="@style/TextViewWidget" />
 </FrameLayout>

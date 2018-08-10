@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -26,5 +26,11 @@
     <style name="TextViewValue">
         <item name="android:textSize">@dimen/text_default_size</item>
         <item name="android:textColor">@color/text_color_dark</item>
+    </style>
+
+    <style name="TextViewWidget">
+        <item name="android:textSize">@dimen/text_widget_size</item>
+        <item name="android:textStyle">bold|italic</item>
+        <item name="android:paddingStart">@dimen/padding_m</item>
     </style>
 </resources>

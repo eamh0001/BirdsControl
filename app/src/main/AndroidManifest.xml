@@ -56,7 +56,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/recipe_widget_info" />
+                android:resource="@xml/bird_widget_info" />
         </receiver>
 
         <service android:name=".widget.WidgetService" />

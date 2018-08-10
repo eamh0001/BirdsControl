@@ -5,10 +5,12 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.eamh.birdcontrol.BirdDetailsActivity;
 import com.eamh.birdcontrol.R;
 import com.eamh.birdcontrol.data.models.Bird;
 import com.squareup.picasso.Picasso;
@@ -47,8 +49,8 @@ public class BirdWidgetProvider extends AppWidgetProvider {
     private static RemoteViews loadWithBirds(Context context) {
         Log.d(TAG, "loadWithBirds ");
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget);
-        views.setViewVisibility(R.id.appwidget_text, View.GONE);
-
+        views.setViewVisibility(R.id.birdDataContainer, View.GONE);
+        views.setViewVisibility(R.id.lvBirds, View.VISIBLE);
         Intent remoteAdapterIntent = new Intent(context, ListRemoteViewsService.class);
         views.setRemoteAdapter(R.id.lvBirds, remoteAdapterIntent);
         views.setEmptyView(R.id.lvBirds, R.id.appwidget_text2);
@@ -80,13 +82,29 @@ public class BirdWidgetProvider extends AppWidgetProvider {
 //        Bitmap bmp = BitmapFactory.decodeFile(bird.getImageUrl());
 //        views.setImageViewBitmap(R.id.birdPhoto, bmp);
         Picasso.get().load(new File(bird.getImageUrl()))
-                .resize(100, 100).centerCrop().into(views, R.id.birdPhoto, new int[]{appWidgetId});
+                .resize(100, 100)
+                .centerCrop()
+                .into(views, R.id.birdPhoto, new int[]{appWidgetId});
+
         String[] genderArray = context.getResources().getStringArray(R.array.genres);
         views.setTextViewText(R.id.tvGender, genderArray[bird.getGender().ordinal()]);
 
-        views.setTextViewText(R.id.appwidget_text, bird.getRing());
+        views.setTextViewText(R.id.tvRing, bird.getRing());
 
-//        views.setViewVisibility(R.id.lvIngredients, View.VISIBLE);
+        views.setTextViewText(R.id.tvBirthDate, bird.getBirthDate());
+
+        views.setTextViewText(R.id.tvRace, bird.getRace());
+
+        views.setTextViewText(R.id.tvVariation, bird.getVariation());
+
+        // Fill in the onClick PendingIntent Template using the specific bird for each item individually
+        Bundle extras = new Bundle();
+        extras.putParcelable(BirdDetailsActivity.INTENT_KEY_BIRD_DETAIL, bird);
+        Intent intent = new Intent(context, BirdDetailsActivity.class);
+        intent.putExtras(extras);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.birdDataContainer, pendingIntent);
+
         return views;
     }
 

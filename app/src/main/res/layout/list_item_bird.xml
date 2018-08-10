@@ -11,8 +11,8 @@
 
         <ImageView
             android:id="@+id/birdPhoto"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/list_bird_img_size"
+            android:layout_height="@dimen/list_bird_img_size"
             android:contentDescription="@string/bird_photo" />
 
         <TextView
@@ -33,6 +33,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray" />
+        android:background="@color/divider" />
 </LinearLayout>
 
