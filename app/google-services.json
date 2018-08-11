@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "364731628781",
+    "firebase_url": "https://bird-control-86553.firebaseio.com",
+    "project_id": "bird-control-86553",
+    "storage_bucket": "bird-control-86553.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364731628781:android:51fdc94948400413",
+        "android_client_info": {
+          "package_name": "com.eamh.birdcontrol"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "364731628781-arid6kvsej9qkme4vkfovtvcu0brs4ad.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi99s77Zu1VrJQwQYr4SK3sa8B9BGCrYs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

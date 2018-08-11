@@ -13,6 +13,9 @@ import com.eamh.birdcontrol.data.PersistenceManager;
 import com.eamh.birdcontrol.data.models.Bird;
 import com.eamh.birdcontrol.fragments.birddetail.BirdDetailsFragment;
 import com.eamh.birdcontrol.fragments.imagecontainer.ImageFragment;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.List;
 
@@ -20,11 +23,15 @@ public class BirdDetailsActivity extends AppCompatActivity
         implements BirdDetailsFragment.OnBirdDetailsFragmentInteractionListener,
         PersistenceManager.ResponseListener {
 
+    private final static String AD_MOB_APP_ID = BuildConfig.AD_MOB_APP_ID;
+    private final static String AD_MOB_INTERSTITIAL_UNIT_ID = BuildConfig.AD_MOB_INTERSTITIAL_UNIT_ID;
+
     public static final String INTENT_KEY_BIRD_DETAIL = "INTENT_KEY_BIRD_DETAIL";
     private static final String TAG = BirdDetailsActivity.class.getSimpleName();
     private static final int ID_BIRD_DETAIL_LOADER = 1;
     private PersistenceManager persistenceManager;
     private Toolbar toolbar;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,8 @@ public class BirdDetailsActivity extends AppCompatActivity
                 .setResponseListener(this)
                 .setContext(this)
                 .build();
+
+        initInterstitialAdd();
 
         Bird bird = getBirdFromIntent();
         showBirdFragment(bird);
@@ -65,6 +74,7 @@ public class BirdDetailsActivity extends AppCompatActivity
             persistenceManager.createBird(bird);
             showSnackBar(getString(R.string.bird_created));
         }
+        showInterstitialAdd();
     }
 
     @Override
@@ -101,5 +111,20 @@ public class BirdDetailsActivity extends AppCompatActivity
     private void replaceFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragmentContainer, fragment).commit();
+    }
+
+    private void initInterstitialAdd() {
+        MobileAds.initialize(this, AD_MOB_APP_ID);
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(AD_MOB_INTERSTITIAL_UNIT_ID);
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void showInterstitialAdd() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d(TAG, "The interstitial wasn't loaded yet.");
+        }
     }
 }
