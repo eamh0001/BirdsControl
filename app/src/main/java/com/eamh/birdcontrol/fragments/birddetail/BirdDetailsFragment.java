@@ -146,11 +146,7 @@ public class BirdDetailsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (!TextUtils.isEmpty(imagePath)) {
-//                    birdDetailsFragmentInteractionListener.onBirdImageClicked(imagePath);
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(imagePath), "image/*");
-                    startActivity(intent);
+                    birdDetailsFragmentInteractionListener.onBirdImageClicked(imagePath);
                 }
             }
         });
@@ -248,7 +244,6 @@ public class BirdDetailsFragment extends Fragment {
 
     public interface OnBirdDetailsFragmentInteractionListener {
         void onSaveBirdClicked(Bird bird);
-
         void onBirdImageClicked(String imagePath);
     }
 }

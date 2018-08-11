@@ -12,13 +12,13 @@ import com.eamh.birdcontrol.data.models.Bird;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Bird} and makes a call to the
  * specified {@link BirdsFragment.OnBirdsFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
 public class BirdsRecyclerViewAdapter
         extends RecyclerView.Adapter<BirdsRecyclerViewAdapter.ViewHolder> {
@@ -63,6 +63,10 @@ public class BirdsRecyclerViewAdapter
     @Override
     public int getItemCount() {
         return birdsValues.size();
+    }
+
+    public ArrayList<Bird> getBirdsList() {
+        return (ArrayList<Bird>) birdsValues;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

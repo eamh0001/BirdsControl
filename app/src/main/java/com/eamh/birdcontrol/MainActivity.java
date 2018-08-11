@@ -3,6 +3,7 @@ package com.eamh.birdcontrol;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,7 +15,6 @@ import com.eamh.birdcontrol.data.PersistenceManager;
 import com.eamh.birdcontrol.data.models.Bird;
 import com.eamh.birdcontrol.fragments.birds.BirdsFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -23,11 +23,13 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int ID_BIRDS_MAIN_LOADER = 0;
+    private static final String KEY_SAVED_INSTANCE_BIRDS_FRAGMENT = "KEY_SAVED_INSTANCE_BIRDS_FRAGMENT";
 
     private ProgressBar mLoadingIndicator;
     private Toolbar toolbar;
 
     private PersistenceManager persistenceManager;
+    private BirdsFragment birdsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +45,32 @@ public class MainActivity extends AppCompatActivity
                 .setResponseListener(this)
                 .setContext(this)
                 .build();
+        showLoadingBar(true);
+        if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            birdsFragment = (BirdsFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, KEY_SAVED_INSTANCE_BIRDS_FRAGMENT);
+        } else {
+            birdsFragment = new BirdsFragment();
+        }
+        showFragment(birdsFragment);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        showLoadingBar(true);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, KEY_SAVED_INSTANCE_BIRDS_FRAGMENT, birdsFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        showLoadingBar(false);
+    }
+
+    @Override
+    public void onBirdsRequested() {
         persistenceManager.retrieveAllBirds();
     }
 
@@ -67,12 +89,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDbAllBirdsRetrieved(List<Bird> birds) {
         Log.d(TAG, "onDbAllBirdsRetrieved " + birds.size());
-        for (Bird bird : birds) {
-            Log.d(TAG, "bird " + bird);
-        }
-        BirdsFragment birdsFragment = BirdsFragment.newInstance(new ArrayList<>(birds));
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, birdsFragment).commit();
+        birdsFragment.setBirds(birds);
         showLoadingBar(false);
     }
 
@@ -89,7 +106,14 @@ public class MainActivity extends AppCompatActivity
         showSnackBar(error);
     }
 
+    private void showFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, fragment).commit();
+        showLoadingBar(false);
+    }
+
     private void launchBirdDetails(Bird bird) {
+        showLoadingBar(true);
         Intent intent = new Intent(this, BirdDetailsActivity.class);
         if (bird != null) {
             intent.putExtra(BirdDetailsActivity.INTENT_KEY_BIRD_DETAIL, bird);

@@ -1,6 +1,7 @@
 package com.eamh.birdcontrol;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,7 +13,6 @@ import com.eamh.birdcontrol.data.BirdsContentProviderPersistenceManager;
 import com.eamh.birdcontrol.data.PersistenceManager;
 import com.eamh.birdcontrol.data.models.Bird;
 import com.eamh.birdcontrol.fragments.birddetail.BirdDetailsFragment;
-import com.eamh.birdcontrol.fragments.imagecontainer.ImageFragment;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
@@ -29,9 +29,13 @@ public class BirdDetailsActivity extends AppCompatActivity
     public static final String INTENT_KEY_BIRD_DETAIL = "INTENT_KEY_BIRD_DETAIL";
     private static final String TAG = BirdDetailsActivity.class.getSimpleName();
     private static final int ID_BIRD_DETAIL_LOADER = 1;
+    private static final String KEY_SAVED_INSTANCE_BIRD_FRAGMENT = "KEY_SAVED_INSTANCE_BIRDS_FRAGMENT";
+
     private PersistenceManager persistenceManager;
+
     private Toolbar toolbar;
     private InterstitialAd mInterstitialAd;
+    private BirdDetailsFragment birdDetailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,17 @@ public class BirdDetailsActivity extends AppCompatActivity
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            birdDetailsFragment = (BirdDetailsFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, KEY_SAVED_INSTANCE_BIRD_FRAGMENT);
+        } else {
+            Bird bird = getBirdFromIntent();
+            birdDetailsFragment = BirdDetailsFragment.newInstance(bird);
+        }
+
+        replaceFragment(birdDetailsFragment);
 
         persistenceManager = BirdsContentProviderPersistenceManager.builder()
                 .setLoaderId(ID_BIRD_DETAIL_LOADER)
@@ -50,9 +65,13 @@ public class BirdDetailsActivity extends AppCompatActivity
                 .build();
 
         initInterstitialAdd();
+    }
 
-        Bird bird = getBirdFromIntent();
-        showBirdFragment(bird);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, KEY_SAVED_INSTANCE_BIRD_FRAGMENT, birdDetailsFragment);
     }
 
     private Bird getBirdFromIntent() {
@@ -79,8 +98,10 @@ public class BirdDetailsActivity extends AppCompatActivity
 
     @Override
     public void onBirdImageClicked(String imagePath) {
-        ImageFragment imageFragment = ImageFragment.newInstance(imagePath);
-        replaceFragment(imageFragment);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(imagePath), "image/*");
+        startActivity(intent);
     }
 
     @Override
@@ -91,17 +112,13 @@ public class BirdDetailsActivity extends AppCompatActivity
     @Override
     public void onDbBirdRetrieved(Bird bird) {
         Log.e(TAG, "onDbBirdRetrieved " + bird);
-        showBirdFragment(bird);
+        birdDetailsFragment = BirdDetailsFragment.newInstance(bird);
+        replaceFragment(birdDetailsFragment);
     }
 
     @Override
     public void onDatabaseError(String error, PersistenceManager.ErrorCode errorCode) {
         showSnackBar(error);
-    }
-
-    private void showBirdFragment(Bird bird) {
-        BirdDetailsFragment birdFragment = BirdDetailsFragment.newInstance(bird);
-        replaceFragment(birdFragment);
     }
 
     private void showSnackBar(String info) {

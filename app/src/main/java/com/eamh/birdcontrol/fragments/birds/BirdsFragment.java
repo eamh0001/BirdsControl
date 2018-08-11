@@ -2,8 +2,10 @@ package com.eamh.birdcontrol.fragments.birds;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -26,8 +28,14 @@ public class BirdsFragment extends Fragment {
 
     private static final String BUNDLE_KEY_BIRDS = "BUNDLE_KEY_BIRDS";
 
+    private static final String BUNDLE_KEY_BIRDS_LIST = "BUNDLE_KEY_BIRDS_LIST";
+    private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
+
     private OnBirdsFragmentInteractionListener birdsFragmentInteractionListener;
     private List<Bird> birds;
+    private RecyclerView recyclerView;
+    private BirdsRecyclerViewAdapter recyclerViewAdapter;
+    private int scrollPosition;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,12 +64,36 @@ public class BirdsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+            scrollPosition = savedInstanceState.getInt(BUNDLE_KEY_SCROLL_POSITION);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        birdsFragmentInteractionListener.onBirdsRequested();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's state here
+        outState.putParcelableArrayList(BUNDLE_KEY_BIRDS_LIST, recyclerViewAdapter.getBirdsList());
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        outState.putInt(BUNDLE_KEY_SCROLL_POSITION,
+                layoutManager.findFirstVisibleItemPosition());
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_birds, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.list);
-        initRecyclerView(recyclerView);
+        recyclerView = view.findViewById(R.id.list);
         FloatingActionButton fabNewBird = view.findViewById(R.id.fab);
         fabNewBird.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,11 +105,16 @@ public class BirdsFragment extends Fragment {
         return view;
     }
 
+    public void setBirds(List<Bird> birds) {
+        this.birds = birds;
+        initRecyclerView(recyclerView);
+    }
+
     private void initRecyclerView(RecyclerView recyclerView) {
 
-//        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(DummyBird.ITEMS, birdsFragmentInteractionListener));
-        recyclerView.setAdapter(new BirdsRecyclerViewAdapter(birds, birdsFragmentInteractionListener));
-
+        recyclerViewAdapter = new BirdsRecyclerViewAdapter(birds, birdsFragmentInteractionListener);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.getLayoutManager().scrollToPosition(scrollPosition);
          /*As T09.07 of NanoDegree:
          Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
          An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
@@ -130,8 +167,8 @@ public class BirdsFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnBirdsFragmentInteractionListener {
+        void onBirdsRequested();
         void onBirdsFragmentListClicked(Bird bird);
-
         void onBirdsFragmentDeleteItem(long birdId);
     }
 }
