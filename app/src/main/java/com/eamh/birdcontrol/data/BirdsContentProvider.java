@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.eamh.birdcontrol.widget.WidgetService;
+
 /**
  * Based upon
  * https://github.com/googlesamples/android-architecture-components/tree/master/PersistenceContentProviderSample
@@ -70,7 +72,7 @@ public class BirdsContentProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @NonNull ContentValues contentValues) {
 
         int uriMatch = MATCHER.match(uri);
-        System.out.println("insert " + uri + "\nMatch " + uriMatch);
+//        System.out.println("insert " + uri + "\nMatch " + uriMatch);
 
         if (uriMatch == CODE_BIRDS_DIR) {
             final Context context = getContext();
@@ -84,6 +86,7 @@ public class BirdsContentProvider extends ContentProvider {
                     contentValues);
             if ((rowId > 0)) {
                 context.getContentResolver().notifyChange(uri, null);
+                WidgetService.startActionUpdateBirdWidgets(context);
                 return ContentUris.withAppendedId(CONTENT_BIRDS_URI, rowId);
             } else throw new android.database.SQLException("Couldn't insert on: " + uri);
         } else throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -163,6 +166,7 @@ public class BirdsContentProvider extends ContentProvider {
                         selectionArguments);
                 if (rowsDeleted != 0) {
                     context.getContentResolver().notifyChange(uri, null);
+                    WidgetService.startActionUpdateBirdWidgets(context);
                 }
                 break;
 
@@ -192,6 +196,7 @@ public class BirdsContentProvider extends ContentProvider {
                         selectionArguments);
                 if (count != 0) {
                     context.getContentResolver().notifyChange(uri, null);
+                    WidgetService.startActionUpdateBirdWidgets(context);
                 }
                 return count;
 

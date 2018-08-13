@@ -28,4 +28,6 @@
     <string name="photo">Photo</string>
     <string name="no_data_available">No data available</string>
     <string name="origin">Origin</string>
+    <string name="button_add_bird">Add bird</string>
+    <string name="save_update_bird">Save or update bird</string>
 </resources>

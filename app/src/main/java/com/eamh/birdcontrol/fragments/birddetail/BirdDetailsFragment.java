@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -39,6 +40,8 @@ public class BirdDetailsFragment extends Fragment {
     private static final int REQUEST_TAKE_PHOTO = 1;
 
     private static final String BUNDLE_KEY_BIRD_DETAILS = "BUNDLE_KEY_BIRD_DETAILS";
+    private static final String BUNDLE_KEY_BIRD_IMG_PATH = "BUNDLE_KEY_BIRD_IMG_PATH";
+
     private OnBirdDetailsFragmentInteractionListener birdDetailsFragmentInteractionListener;
 
     private Bird bird;
@@ -80,6 +83,13 @@ public class BirdDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's state here
+        outState.putString(BUNDLE_KEY_BIRD_IMG_PATH, imagePath);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnBirdDetailsFragmentInteractionListener) {
@@ -106,6 +116,16 @@ public class BirdDetailsFragment extends Fragment {
             showBirdDataOnUI(bird);
         }
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+            imagePath = savedInstanceState.getString(BUNDLE_KEY_BIRD_IMG_PATH);
+            setBirdPhoto(imagePath);
+        }
     }
 
     @Override
@@ -208,13 +228,20 @@ public class BirdDetailsFragment extends Fragment {
 
     private void setBirdPhoto(String imagePath) {
         if (!TextUtils.isEmpty(imagePath)) {
-            Picasso.get().load(new File(imagePath))
-                    .fit()
-                    .centerCrop()
-                    .into(birdPhoto);
+            setImageView(imagePath);
             this.imagePath = imagePath;
+        } else if (!TextUtils.isEmpty(this.imagePath)) {
+            setImageView(this.imagePath);
         }
     }
+
+    private void setImageView(String imagePath) {
+        Picasso.get().load(new File(imagePath))
+                .fit()
+                .centerCrop()
+                .into(birdPhoto);
+    }
+
 
     private void saveBirdClicked() {
         Bird bird = createBirdFromUIData();

@@ -201,5 +201,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/content_save_outline"
+        android:contentDescription="@string/save_update_bird"
         android:tint="@color/white" />
 </FrameLayout>

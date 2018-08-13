@@ -18,9 +18,11 @@
     <string name="male">Macho</string>
     <string name="abrv_undefined">I</string>
     <string name="undefined">Indefinido</string>
-    <string name="error_loading_bird">Can\'t retrieve bird</string>
+    <string name="error_loading_bird">No se puede obtener el ave</string>
     <string name="bird_updated">Ave actualizada</string>
     <string name="bird_created">Ave creada</string>
     <string name="photo">Foto</string>
     <string name="no_data_available">Sin datos</string>
+    <string name="button_add_bird">Añadir ave</string>
+    <string name="save_update_bird">Guardar o actualizar ave</string>
 </resources>

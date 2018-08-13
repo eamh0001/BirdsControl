@@ -17,6 +17,9 @@ public class WidgetService extends IntentService {
             "com.eamh.birdcontrol.action.get_birds";
     public static final String ACTION_GET_BIRD_DETAILS =
             "com.eamh.birdcontrol.action.get_bird_details";
+    public static final String ACTION_UPDATE_BIRD_WIDGETS =
+            "com.eamh.birdcontrol.action.update_bird_widgets";
+
     public static final String INTENT_KEY_BIRD_DETAILS = "IKBD";
     private static final String TAG = WidgetService.class.getName();
 
@@ -24,9 +27,27 @@ public class WidgetService extends IntentService {
         super(TAG);
     }
 
+    /**
+     * Starts this service to perform a retrieve birds from persistence action with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
     public static void startActionGetBirds(Context context) {
         Intent intent = new Intent(context, WidgetService.class);
         intent.setAction(ACTION_GET_BIRDS);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to update the widgets with new data. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    public static void startActionUpdateBirdWidgets(Context context) {
+        Intent intent = new Intent(context, WidgetService.class);
+        intent.setAction(ACTION_UPDATE_BIRD_WIDGETS);
         context.startService(intent);
     }
 
@@ -45,10 +66,18 @@ public class WidgetService extends IntentService {
                         handleActionGetBirdDetails(bird);
                     }
                     break;
+                case ACTION_UPDATE_BIRD_WIDGETS:
+                    handleActionUpdateBirdWidgets();
+                    break;
                 default:
                     Log.e(TAG, "Action doesn't found: " + action);
             }
         }
+    }
+
+    private void handleActionUpdateBirdWidgets() {
+        Log.d(TAG, "handleActionUpdateBirdWidgets");
+        //TODO
     }
 
     private void handleActionGetBirds() {
