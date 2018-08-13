@@ -77,7 +77,7 @@ public class WidgetService extends IntentService {
 
     private void handleActionUpdateBirdWidgets() {
         Log.d(TAG, "handleActionUpdateBirdWidgets");
-        //TODO
+        handleActionGetBirds();
     }
 
     private void handleActionGetBirds() {

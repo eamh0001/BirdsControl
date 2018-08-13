@@ -6,6 +6,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -65,26 +67,23 @@ public class BirdWidgetProvider extends AppWidgetProvider {
         return views;
     }
 
-    private static RemoteViews loadWithBirdDetails(Context context, Bird bird, int appWidgetId) {
+    private static RemoteViews loadWithBirdDetails(Context context, final Bird bird, final int appWidgetId) {
 
-//        Intent remoteAdapterIntent = new Intent(context, IngredientsRemoteViewsService.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelableArrayList(WidgetService.INTENT_KEY_BIRD_DETAILS, bird);
-//
-//        remoteAdapterIntent.putExtra(IngredientsRemoteViewsService.KEY_BUNDLE_EXTRAS, bundle);
-//
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget);
-//        views.setRemoteAdapter(R.id.lvIngredients, remoteAdapterIntent);
-//        views.setEmptyView(R.id.lvIngredients, R.id.appwidget_text2);
+        final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget);
 
         views.setViewVisibility(R.id.lvBirds, View.GONE);
         views.setViewVisibility(R.id.birdDataContainer, View.VISIBLE);
-//        Bitmap bmp = BitmapFactory.decodeFile(bird.getImageUrl());
-//        views.setImageViewBitmap(R.id.birdPhoto, bmp);
-        Picasso.get().load(new File(bird.getImageUrl()))
-                .resize(100, 100)
-                .centerCrop()
-                .into(views, R.id.birdPhoto, new int[]{appWidgetId});
+        Handler uiHandler = new Handler(Looper.getMainLooper());
+        uiHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Picasso.get().load(new File(bird.getImageUrl()))
+                        .resize(100, 100)
+                        .centerCrop()
+                        .into(views, R.id.birdPhoto, new int[]{appWidgetId});
+            }
+        });
+
 
         String[] genderArray = context.getResources().getStringArray(R.array.genres);
         views.setTextViewText(R.id.tvGender, genderArray[bird.getGender().ordinal()]);
@@ -113,18 +112,6 @@ public class BirdWidgetProvider extends AppWidgetProvider {
         // There may be multiple widgets active, so update all of them
         WidgetService.startActionGetBirds(context);
     }
-
-//    private static RemoteViews loadEmptyView(Context context) {
-//        Log.d(TAG, "loadEmptyView ");
-//        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.recipe_widget);
-//        CharSequence widgetText = "potato";
-//        views.setTextViewText(R.id.appwidget_text, widgetText);
-//        Intent getRecipesIntent = new Intent(context, WidgetService.class);
-//        getRecipesIntent.setAction(WidgetService.ACTION_GET_BIRDS);
-//        PendingIntent pendingIntent = PendingIntent.getService(context, 0, getRecipesIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        views.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
-//        return views;
-//    }
 
     @Override
     public void onEnabled(Context context) {
