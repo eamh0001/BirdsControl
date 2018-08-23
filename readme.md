@@ -6,7 +6,7 @@ saving data such as the race and variation of the bird, his/her ring code (or na
 his birth date, take and save a photo and other annotations.
 The app provides a Widget with the list of birds and is translated to spanish too.
 
-Bird's Control
+Control de Aves
 -----
 
 Control de aves es una aplicación que facilita el trabajo de un criador de aves, guardando información
