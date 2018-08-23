@@ -1,3 +1,4 @@
-Use a keystore.jks on project root folder, with alias 'key0', and key and store passwords '123456'
+![Alt text](/screenshots/device-2018-08-23-162604.png?raw=true "Bird's details")
+
 
 Bird icon made by Freepik from www.flaticon.com

@@ -29,7 +29,9 @@
                         android:layout_width="@dimen/photo_size"
                         android:layout_height="@dimen/photo_size"
                         android:contentDescription="@string/bird_photo"
-                        android:src="@color/primary" />
+                        android:background="@color/divider"
+                        android:src="@drawable/camera_off"
+                        android:tint="@color/white" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
